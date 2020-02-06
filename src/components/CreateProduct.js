@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import db from '../firestoreConfig';
-import { Row, Col, Button, Form, FormGroup, Label, Input, FormText, InputGroup   } from 'reactstrap' ;
+import { Row, Col, Button, Form, FormGroup, Label, Input, FormText, InputGroup, Table   } from 'reactstrap' ;
 
 
 class  CreateProduct extends Component {
@@ -11,6 +11,20 @@ class  CreateProduct extends Component {
       }
 
 
+      componentDidMount(){
+        db.collection('productos').onSnapshot((snapShots) =>{
+            this.setState({
+                items: snapShots.docs.map( doc => {
+                    return {
+                        id: doc.id,
+                        data: doc.data()
+                    }
+                })
+            })
+        },error =>{
+            console.log(error)
+        });   
+    };
 
     
 
@@ -59,6 +73,24 @@ class  CreateProduct extends Component {
                         </div>
                     </Col>
                 </Row>
+                <Table hover className="text-center mt-4">
+                        <thead>
+                            <tr>
+                                <th>Nombre</th>
+                                <th>Editar</th>
+                                <th>Eliminar</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        {items && items !== undefined ? items.map((item, key) => (
+                                <tr key={key} >
+                                    <td>{item.data.item}</td>
+                                    <td><Button color="warning" onClick={()=> this.getTodo(item.id)}>Editar</Button></td>
+                                    <td><Button color="danger" onClick={ ()=> this.deleteItem(item.id)}>Eliminar</Button></td>
+                                </tr>
+                            )): null }
+                        </tbody>
+                </Table>        
             </div>
           );
     }
